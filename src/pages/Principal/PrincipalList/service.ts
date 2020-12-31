@@ -1,14 +1,9 @@
 import request from 'umi-request';
-import { TableListParams } from './data.d';
+import type {TableListParams} from './data.d';
 
-export async function queryPrincipals(params?: TableListParams) {
+
+export async function queryPrincipal(params?: TableListParams) {
   return request('/api/principals', {
-    params,
-  });
-}
-
-export async function queryRule(params?: TableListParams) {
-  return request('/api/rule', {
     params,
   });
 }

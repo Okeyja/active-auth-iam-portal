@@ -1,31 +1,31 @@
-export interface TableListItem {
+export type TableListItem = {
   id: number;
   name: string;
   resourceLocator: string;
   owner: string;
   createTime: Date;
-  canUseToken: boolean;
   canUseSignature: boolean;
-}
+  canUseToken: boolean;
+};
 
-export interface TableListPagination {
+export type TableListPagination = {
   total: number;
   pageSize: number;
   current: number;
-}
+};
 
-export interface TableListData {
+export type TableListData = {
   list: TableListItem[];
   pagination: Partial<TableListPagination>;
-}
+};
 
-export interface TableListParams {
+export type TableListParams = {
   status?: string;
   name?: string;
   desc?: string;
   key?: number;
   pageSize?: number;
   currentPage?: number;
-  filter?: { [key: string]: any[] };
-  sorter?: { [key: string]: any };
-}
+  filter?: Record<string, any[]>;
+  sorter?: Record<string, any>;
+};

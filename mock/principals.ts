@@ -3,7 +3,6 @@ import {Request, Response} from 'express';
 const data = [
   {
     id: '1',
-    key: '1',
     resourceLocator: 'iam://users/1/principal',
     owner: null,
     name: 'ponyma',
@@ -13,7 +12,6 @@ const data = [
   },
   {
     id: '2',
-    key: '2',
     resourceLocator: 'iam://users/2/principal',
     owner: null,
     name: 'jackma',
@@ -23,7 +21,6 @@ const data = [
   },
   {
     id: '3',
-    key: '3',
     resourceLocator: 'iam://users/3/principal',
     owner: null,
     name: 'robinlee',
@@ -33,7 +30,6 @@ const data = [
   },
   {
     id: '4',
-    key: '4',
     resourceLocator: 'iam://users/4/principal',
     owner: 'iam://users/1/principal',
     name: 'qinshihuang',
@@ -43,7 +39,6 @@ const data = [
   },
   {
     id: '5',
-    key: '5',
     resourceLocator: 'iam://users/5/principal',
     owner: 'iam://users/2/principal',
     name: 'napoleon',

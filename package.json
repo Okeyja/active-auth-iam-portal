@@ -55,6 +55,7 @@
     "classnames": "^2.2.6",
     "dva": "^2.4.0",
     "lodash": "^4.17.11",
+    "lodash-decorators": "^6.0.0",
     "moment": "^2.25.3",
     "omit.js": "^2.0.2",
     "qs": "^6.9.0",

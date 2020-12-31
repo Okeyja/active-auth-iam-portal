@@ -1,5 +1,5 @@
-import {PlusOutlined} from '@ant-design/icons';
-import {Button, message, Drawer} from 'antd';
+import {DeleteOutlined, PlusOutlined} from '@ant-design/icons';
+import {Button, Divider, message, Input, Drawer} from 'antd';
 import React, {useState, useRef} from 'react';
 import {PageContainer, FooterToolbar} from '@ant-design/pro-layout';
 import type {ProColumns, ActionType} from '@ant-design/pro-table';
@@ -9,7 +9,7 @@ import CreateForm from './components/CreateForm';
 import type {FormValueType} from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import type {TableListItem} from './data.d';
-import {updateRule, addRule, removeRule, queryPrincipals} from './service';
+import {queryPrincipal, updateRule, addRule, removeRule} from './service';
 
 /**
  * 添加节点
@@ -38,8 +38,6 @@ const handleUpdate = async (fields: FormValueType) => {
   try {
     await updateRule({
       name: fields.name,
-      desc: fields.desc,
-      key: fields.key,
     });
     hide();
 
@@ -61,7 +59,7 @@ const handleRemove = async (selectedRows: TableListItem[]) => {
   if (!selectedRows) return true;
   try {
     await removeRule({
-      key: selectedRows.map((row) => row.key),
+      key: selectedRows.map((row) => row.id),
     });
     hide();
     message.success('删除成功，即将刷新');
@@ -84,76 +82,83 @@ const TableList: React.FC<{}> = () => {
     {
       title: 'Name',
       dataIndex: 'name',
-      tip: '规则名称是唯一的 key',
+      tip: 'Principal Name',
       formItemProps: {
         rules: [
           {
             required: true,
-            message: '规则名称为必填项',
+            message: 'Cannot be empty.',
           },
         ],
+      },
+      render: (dom, entity) => {
+        return <a onClick={() => setRow(entity)}>{dom}</a>;
       },
     },
     {
       title: 'Locator',
       dataIndex: 'resourceLocator',
-      tip: 'Locator is the URI of resource.',
-      formItemProps: {
-        rules: [
-          {
-            required: true,
-            message: '规则名称为必填项',
-          },
-        ],
-      },
+      valueType: 'textarea',
+      hideInForm: true,
     },
     {
-      title: 'Owner',
+      title: 'Owner (Locator)',
       dataIndex: 'owner',
-      tip: 'Principal Owner',
-    },
-    {
-      title: 'Can use signature',
-      dataIndex: 'canUseSignature',
-      tip: 'Can use signature.',
-      align: 'center',
-      render(dom) {
-        return dom ? 'yes' : 'no';
-      }
-    },
-    {
-      title: 'Can use token',
-      dataIndex: 'canUseToken',
-      tip: 'Can use token, login with username and password.',
-      align: 'center',
-      render(dom) {
-        return dom ? 'yes' : 'no';
-      }
     },
     {
       title: 'Create Time',
       dataIndex: 'createTime',
-      tip: 'createTime',
+      sorter: true,
       valueType: 'dateTime',
-      align: 'center',
+      search: false,
+      hideInForm: true,
+      renderFormItem: (item, {defaultRender, ...rest}, form) => {
+        const status = form.getFieldValue('status');
+        if (`${status}` === '0') {
+          return false;
+        }
+        if (`${status}` === '3') {
+          return <Input {...rest} placeholder="请输入异常原因！"/>;
+        }
+        return defaultRender(item);
+      },
+    },
+    {
+      title: 'Options',
+      dataIndex: 'option',
+      valueType: 'option',
+      render: (_, record) => (
+        <>
+          <a
+            onClick={() => {
+              handleUpdateModalVisible(true);
+              setStepFormValues(record);
+            }}
+          >
+            Setting
+          </a>
+          <Divider type="vertical"/>
+          <a href="">Grant</a>
+        </>
+      ),
     },
   ];
 
   return (
     <PageContainer>
       <ProTable<TableListItem>
-        headerTitle="Principal"
+        headerTitle="Principals"
         actionRef={actionRef}
-        rowKey="key"
+        rowKey="id"
         search={{
           labelWidth: 120,
         }}
         toolBarRender={() => [
           <Button type="primary" onClick={() => handleModalVisible(true)}>
-            <PlusOutlined/> 新建
+            <PlusOutlined/> Add New
           </Button>,
         ]}
-        request={(params, sorter, filter) => queryPrincipals({...params, sorter, filter})}
+        request={(params, sorter, filter) => queryPrincipal({...params, sorter, filter})}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => setSelectedRows(selectedRows),
@@ -163,23 +168,28 @@ const TableList: React.FC<{}> = () => {
         <FooterToolbar
           extra={
             <div>
-              已选择 <a style={{fontWeight: 600}}>{selectedRowsState.length}</a> 项&nbsp;&nbsp;
+              Selecting <a style={{fontWeight: 600}}>{selectedRowsState.length}</a> item(s).&nbsp;&nbsp;
+              {/*
               <span>
                 服务调用次数总计 {selectedRowsState.reduce((pre, item) => pre + item.callNo, 0)} 万
               </span>
+              */}
             </div>
           }
         >
+          <Button>Disable Token</Button>
+          <Button>Disable Signature</Button>
           <Button
+            danger
+            type="primary"
             onClick={async () => {
               await handleRemove(selectedRowsState);
               setSelectedRows([]);
               actionRef.current?.reloadAndRest?.();
             }}
-          >
-            批量删除
+          ><DeleteOutlined/>
+            Delete
           </Button>
-          <Button type="primary">批量审批</Button>
         </FooterToolbar>
       )}
       <CreateForm onCancel={() => handleModalVisible(false)} modalVisible={createModalVisible}>
@@ -193,7 +203,7 @@ const TableList: React.FC<{}> = () => {
               }
             }
           }}
-          rowKey="key"
+          rowKey="id"
           type="form"
           columns={columns}
         />

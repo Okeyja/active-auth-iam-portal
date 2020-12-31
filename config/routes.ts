@@ -53,15 +53,26 @@ export default [
                 name: 'Principal',
                 icon: 'user',
                 path: '/principal',
-                component: './Principal',
                 routes: [
+                  {
+                    name: 'Principal',
+                    icon: 'user',
+                    path: '/principal/principal-list',
+                    component: './Principal/PrincipalList',
+                  },
                   {
                     name: 'Subprincipal',
                     icon: 'user',
-                    path: '/principal/subprincipal',
-                    component: './Principal/Subprincipal',
+                    path: '/principal/subprincipal-list',
+                    component: './Principal/SubprincipalList',
                   },
-                ]
+                  {
+                    name: 'Info',
+                    icon: 'user',
+                    path: '/principal/info',
+                    component: './Principal/Info',
+                  },
+                ],
               },
               {
                 name: 'Policy',

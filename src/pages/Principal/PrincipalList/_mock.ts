@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { Request, Response } from 'express';
-import { parse } from 'url';
-import { TableListItem, TableListParams } from './data.d';
+import type {Request, Response} from 'express';
+import {parse} from 'url';
+import type {TableListItem, TableListParams} from './data.d';
 
 // mock tableListDataSource
 const genList = (current: number, pageSize: number) => {
@@ -38,7 +38,7 @@ function getRule(req: Request, res: Response, u: string) {
   if (!realUrl || Object.prototype.toString.call(realUrl) !== '[object String]') {
     realUrl = req.url;
   }
-  const { current = 1, pageSize = 10 } = req.query;
+  const {current = 1, pageSize = 10} = req.query;
   const params = (parse(realUrl, true).query as unknown) as TableListParams;
 
   let dataSource = [...tableListDataSource].slice(
@@ -68,19 +68,14 @@ function getRule(req: Request, res: Response, u: string) {
     });
   }
   if (params.filter) {
-    const filter = JSON.parse(params.filter as any) as {
-      [key: string]: string[];
-    };
+    const filter = JSON.parse(params.filter as any) as Record<string, string[]>;
     if (Object.keys(filter).length > 0) {
       dataSource = dataSource.filter((item) => {
         return Object.keys(filter).some((key) => {
           if (!filter[key]) {
             return true;
           }
-          if (filter[key].includes(`${item[key]}`)) {
-            return true;
-          }
-          return false;
+          return filter[key].includes(`${item[key]}`);
         });
       });
     }
@@ -107,7 +102,7 @@ function postRule(req: Request, res: Response, u: string, b: Request) {
   }
 
   const body = (b && b.body) || req.body;
-  const { method, name, desc, key } = body;
+  const {method, name, desc, key} = body;
 
   switch (method) {
     /* eslint no-case-declarations:0 */
@@ -143,8 +138,8 @@ function postRule(req: Request, res: Response, u: string, b: Request) {
         let newRule = {};
         tableListDataSource = tableListDataSource.map((item) => {
           if (item.key === key) {
-            newRule = { ...item, desc, name };
-            return { ...item, desc, name };
+            newRule = {...item, desc, name};
+            return {...item, desc, name};
           }
           return item;
         });
