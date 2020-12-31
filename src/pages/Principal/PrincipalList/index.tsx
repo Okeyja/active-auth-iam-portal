@@ -16,15 +16,15 @@ import {queryPrincipal, updateRule, addRule, removeRule} from './service';
  * @param fields
  */
 const handleAdd = async (fields: TableListItem) => {
-  const hide = message.loading('正在添加');
+  const hide = message.loading('Adding...');
   try {
     await addRule({...fields});
     hide();
-    message.success('添加成功');
+    message.success('Added!');
     return true;
   } catch (error) {
     hide();
-    message.error('添加失败请重试！');
+    message.error('Add failed, please retry.');
     return false;
   }
 };
@@ -34,18 +34,18 @@ const handleAdd = async (fields: TableListItem) => {
  * @param fields
  */
 const handleUpdate = async (fields: FormValueType) => {
-  const hide = message.loading('正在配置');
+  const hide = message.loading('Updating...');
   try {
     await updateRule({
       name: fields.name,
     });
     hide();
 
-    message.success('配置成功');
+    message.success('Updated!');
     return true;
   } catch (error) {
     hide();
-    message.error('配置失败请重试！');
+    message.error('Update failed, please retry.');
     return false;
   }
 };
@@ -55,18 +55,18 @@ const handleUpdate = async (fields: FormValueType) => {
  * @param selectedRows
  */
 const handleRemove = async (selectedRows: TableListItem[]) => {
-  const hide = message.loading('正在删除');
+  const hide = message.loading('Deleting...');
   if (!selectedRows) return true;
   try {
     await removeRule({
       key: selectedRows.map((row) => row.id),
     });
     hide();
-    message.success('删除成功，即将刷新');
+    message.success('Deleted. Refreshing...');
     return true;
   } catch (error) {
     hide();
-    message.error('删除失败，请重试');
+    message.error('Delete failed, please retry.');
     return false;
   }
 };
@@ -192,7 +192,19 @@ const TableList: React.FC<{}> = () => {
           </Button>
         </FooterToolbar>
       )}
-      <CreateForm onCancel={() => handleModalVisible(false)} modalVisible={createModalVisible}>
+      <CreateForm onCancel={() => handleModalVisible(false)}
+                  createModalVisible={createModalVisible}
+                  onSubmit={async (value) => {
+                    const success = await handleUpdate(value);
+                    if (success) {
+                      handleUpdateModalVisible(false);
+                      setStepFormValues({});
+                      if (actionRef.current) {
+                        actionRef.current.reload();
+                      }
+                    }
+                  }}
+                  values={stepFormValues}>
         <ProTable<TableListItem, TableListItem>
           onSubmit={async (value) => {
             const success = await handleAdd(value);

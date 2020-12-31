@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { Form, Button, DatePicker, Input, Modal, Radio, Select, Steps } from 'antd';
 
-import { TableListItem } from '../data.d';
+import type { TableListItem } from '../data.d';
 
-export interface FormValueType extends Partial<TableListItem> {
+export type FormValueType = {
   target?: string;
   template?: string;
   type?: string;
   time?: string;
   frequency?: string;
-}
+} & Partial<TableListItem>
 
-export interface UpdateFormProps {
+export type UpdateFormProps = {
   onCancel: (flag?: boolean, formVals?: FormValueType) => void;
   onSubmit: (values: FormValueType) => void;
   updateModalVisible: boolean;
@@ -19,11 +19,10 @@ export interface UpdateFormProps {
 }
 const FormItem = Form.Item;
 const { Step } = Steps;
-const { TextArea } = Input;
 const { Option } = Select;
 const RadioGroup = Radio.Group;
 
-export interface UpdateFormState {
+export type UpdateFormState = {
   formVals: FormValueType;
   currentStep: number;
 }
@@ -36,8 +35,6 @@ const formLayout = {
 const UpdateForm: React.FC<UpdateFormProps> = (props) => {
   const [formVals, setFormVals] = useState<FormValueType>({
     name: props.values.name,
-    desc: props.values.desc,
-    key: props.values.key,
     target: '0',
     template: '0',
     type: '1',
@@ -125,17 +122,17 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
       <>
         <FormItem
           name="name"
-          label="规则名称"
-          rules={[{ required: true, message: '请输入规则名称！' }]}
+          label="Name"
+          rules={[{ required: true, message: 'Input a principal name.' }]}
         >
-          <Input placeholder="请输入" />
+          <Input placeholder="Please input." />
         </FormItem>
         <FormItem
-          name="desc"
-          label="规则描述"
-          rules={[{ required: true, message: '请输入至少五个字符的规则描述！', min: 5 }]}
+          name="password"
+          label="Password"
+          rules={[{ message: 'Input at least 8 characters!', min: 8 }]}
         >
-          <TextArea rows={4} placeholder="请输入至少五个字符" />
+          <Input.Password placeholder="Leave empty for not changing." />
         </FormItem>
       </>
     );
@@ -189,8 +186,8 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
       onCancel={() => handleUpdateModalVisible()}
     >
       <Steps style={{ marginBottom: 28 }} size="small" current={currentStep}>
-        <Step title="基本信息" />
-        <Step title="配置规则属性" />
+        <Step title="Basic Info" />
+        <Step title="Advanced Info" />
         <Step title="设定调度周期" />
       </Steps>
       <Form
@@ -202,7 +199,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
           type: formVals.type,
           frequency: formVals.frequency,
           name: formVals.name,
-          desc: formVals.desc,
+          desc: formVals.name,
         }}
       >
         {renderContent()}
