@@ -4,8 +4,10 @@ export type TableListItem = {
   resourceLocator: string;
   owner: string;
   createTime: Date;
-  canUseSignature: boolean;
-  canUseToken: boolean;
+  isSignatureCreatable: boolean;
+  isSignatureUsable: boolean;
+  isSessionCreatable: boolean;
+  isSessionUsable: boolean;
 };
 
 export type TableListPagination = {

@@ -61,12 +61,6 @@ export default [
                     component: './Principal/PrincipalList',
                   },
                   {
-                    name: 'Subprincipal',
-                    icon: 'user',
-                    path: '/principal/subprincipal-list',
-                    component: './Principal/SubprincipalList',
-                  },
-                  {
                     name: 'Info',
                     icon: 'user',
                     path: '/principal/info',

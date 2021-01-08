@@ -1,5 +1,5 @@
 import {DeleteOutlined, PlusOutlined} from '@ant-design/icons';
-import {Button, Divider, message, Input, Drawer} from 'antd';
+import {Button, Divider, message, Input, Drawer, Tag} from 'antd';
 import React, {useState, useRef} from 'react';
 import {PageContainer, FooterToolbar} from '@ant-design/pro-layout';
 import type {ProColumns, ActionType} from '@ant-design/pro-table';
@@ -9,7 +9,15 @@ import CreateForm from './components/CreateForm';
 import type {FormValueType} from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import type {TableListItem} from './data.d';
-import {queryPrincipal, updateRule, addRule, removeRule} from './service';
+import {
+  queryPrincipal,
+  updateRule,
+  addRule,
+  removeRule,
+  querySubprincipal,
+  queryPrincipalGroup,
+  queryAppDomain
+} from './service';
 
 /**
  * 添加节点
@@ -82,7 +90,7 @@ const TableList: React.FC<{}> = () => {
     {
       title: 'Name',
       dataIndex: 'name',
-      tip: 'Principal Name',
+      tip: 'Principal name',
       formItemProps: {
         rules: [
           {
@@ -104,6 +112,273 @@ const TableList: React.FC<{}> = () => {
     {
       title: 'Owner (Locator)',
       dataIndex: 'owner',
+    },
+    {
+      title: 'Signature',
+      dataIndex: 'signature',
+      align: "center",
+      render: (_, record) => (
+        <>
+          {
+            record.isSignatureCreatable
+              ? <Tag color="#87d068">Creatable</Tag>
+              : <Tag color="#f50">None Creatable</Tag>
+          }
+          {record.isSignatureUsable
+            ? <Tag color="#87d068">Usable</Tag>
+            : <Tag color="#f50">None Usable</Tag>
+          }
+        </>
+      ),
+    },
+    {
+      title: 'Session',
+      dataIndex: 'session',
+      align: "center",
+      render: (_, record) => (
+        <>
+          {
+            record.isSessionCreatable
+              ? <Tag color="#87d068">Creatable</Tag>
+              : <Tag color="#f50">None Creatable</Tag>
+          }
+          {record.isSessionUsable
+            ? <Tag color="#87d068">Usable</Tag>
+            : <Tag color="#f50">None Usable</Tag>
+          }
+        </>
+      ),
+    },
+    {
+      title: 'Create Time',
+      dataIndex: 'createTime',
+      sorter: true,
+      valueType: 'dateTime',
+      search: false,
+      hideInForm: true,
+      renderFormItem: (item, {defaultRender, ...rest}, form) => {
+        const status = form.getFieldValue('status');
+        if (`${status}` === '0') {
+          return false;
+        }
+        if (`${status}` === '3') {
+          return <Input {...rest} placeholder="请输入异常原因！"/>;
+        }
+        return defaultRender(item);
+      },
+    },
+    {
+      title: 'Options',
+      dataIndex: 'option',
+      valueType: 'option',
+      render: (_, record) => (
+        <>
+          <a
+            onClick={() => {
+              handleUpdateModalVisible(true);
+              setStepFormValues(record);
+            }}
+          >
+            Setting
+          </a>
+          <Divider type="vertical"/>
+          <a href="">Grant</a>
+        </>
+      ),
+    },
+  ];
+
+  const subprincipalColumns: ProColumns<TableListItem>[] = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      tip: 'Principal name',
+      formItemProps: {
+        rules: [
+          {
+            required: true,
+            message: 'Cannot be empty.',
+          },
+        ],
+      },
+      render: (dom, entity) => {
+        return <a onClick={() => setRow(entity)}>{dom}</a>;
+      },
+    },
+    {
+      title: 'Locator',
+      dataIndex: 'resourceLocator',
+      valueType: 'textarea',
+      hideInForm: true,
+      render: (dom, entity) => {
+        return <a href={`?id=${entity.id}`}>{dom}</a>;
+      },
+    },
+    {
+      title: 'Signature',
+      dataIndex: 'signature',
+      align: "center",
+      render: (_, record) => (
+        <>
+          {
+            record.isSignatureCreatable
+              ? <Tag color="#87d068">Creatable</Tag>
+              : <Tag color="#f50">None Creatable</Tag>
+          }
+          {record.isSignatureUsable
+            ? <Tag color="#87d068">Usable</Tag>
+            : <Tag color="#f50">None Usable</Tag>
+          }
+        </>
+      ),
+    },
+    {
+      title: 'Session',
+      dataIndex: 'session',
+      align: "center",
+      render: (_, record) => (
+        <>
+          {
+            record.isSessionCreatable
+              ? <Tag color="#87d068">Creatable</Tag>
+              : <Tag color="#f50">None Creatable</Tag>
+          }
+          {record.isSessionUsable
+            ? <Tag color="#87d068">Usable</Tag>
+            : <Tag color="#f50">None Usable</Tag>
+          }
+        </>
+      ),
+    },
+    {
+      title: 'Create Time',
+      dataIndex: 'createTime',
+      sorter: true,
+      valueType: 'dateTime',
+      search: false,
+      hideInForm: true,
+      renderFormItem: (item, {defaultRender, ...rest}, form) => {
+        const status = form.getFieldValue('status');
+        if (`${status}` === '0') {
+          return false;
+        }
+        if (`${status}` === '3') {
+          return <Input {...rest} placeholder="请输入异常原因！"/>;
+        }
+        return defaultRender(item);
+      },
+    },
+    {
+      title: 'Options',
+      dataIndex: 'option',
+      valueType: 'option',
+      render: (_, record) => (
+        <>
+          <a
+            onClick={() => {
+              handleUpdateModalVisible(true);
+              setStepFormValues(record);
+            }}
+          >
+            Setting
+          </a>
+          <Divider type="vertical"/>
+          <a href="">Grant</a>
+        </>
+      ),
+    },
+  ];
+
+  const principalGroupColumns: ProColumns<TableListItem>[] = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      tip: 'Principal name',
+      formItemProps: {
+        rules: [
+          {
+            required: true,
+            message: 'Cannot be empty.',
+          },
+        ],
+      },
+      render: (dom, entity) => {
+        return <a onClick={() => setRow(entity)}>{dom}</a>;
+      },
+    },
+    {
+      title: 'Locator',
+      dataIndex: 'resourceLocator',
+      valueType: 'textarea',
+      hideInForm: true,
+      render: (dom, entity) => {
+        return <a href={`?id=${entity.id}`}>{dom}</a>;
+      },
+    },
+    {
+      title: 'Create Time',
+      dataIndex: 'createTime',
+      sorter: true,
+      valueType: 'dateTime',
+      search: false,
+      hideInForm: true,
+      renderFormItem: (item, {defaultRender, ...rest}, form) => {
+        const status = form.getFieldValue('status');
+        if (`${status}` === '0') {
+          return false;
+        }
+        if (`${status}` === '3') {
+          return <Input {...rest} placeholder="请输入异常原因！"/>;
+        }
+        return defaultRender(item);
+      },
+    },
+    {
+      title: 'Options',
+      dataIndex: 'option',
+      valueType: 'option',
+      render: (_, record) => (
+        <>
+          <a
+            onClick={() => {
+              handleUpdateModalVisible(true);
+              setStepFormValues(record);
+            }}
+          >
+            Setting
+          </a>
+          <Divider type="vertical"/>
+          <a href="">Grant</a>
+        </>
+      ),
+    },
+  ];
+
+  const appDomainColumns: ProColumns<TableListItem>[] = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      tip: 'Principal name',
+      formItemProps: {
+        rules: [
+          {
+            required: true,
+            message: 'Cannot be empty.',
+          },
+        ],
+      },
+      render: (dom, entity) => {
+        return <a onClick={() => setRow(entity)}>{dom}</a>;
+      },
+    },
+    {
+      title: 'Locator',
+      dataIndex: 'resourceLocator',
+      valueType: 'textarea',
+      hideInForm: true,
+      render: (dom, entity) => {
+        return <a href={`?id=${entity.id}`}>{dom}</a>;
+      },
     },
     {
       title: 'Create Time',
@@ -150,6 +425,32 @@ const TableList: React.FC<{}> = () => {
         headerTitle="Principals"
         actionRef={actionRef}
         rowKey="id"
+        expandable={{
+          expandedRowRender: record => <>
+            <ProTable<TableListItem>
+              rowKey="id"
+              headerTitle="Subprincipals"
+              columns={subprincipalColumns}
+              search={false}
+              request={(params, sorter, filter) => querySubprincipal({...params, sorter, filter})}
+            />
+            <ProTable<TableListItem>
+              rowKey="id"
+              headerTitle="Principal Groups"
+              columns={principalGroupColumns}
+              search={false}
+              request={(params, sorter, filter) => queryPrincipalGroup({...params, sorter, filter})}
+            />
+            <ProTable<TableListItem>
+              rowKey="id"
+              headerTitle="App Domains"
+              columns={appDomainColumns}
+              search={false}
+              request={(params, sorter, filter) => queryAppDomain({...params, sorter, filter})}
+            />
+          </>,
+          rowExpandable: record => record.name !== 'Not Expandable',
+        }}
         search={{
           labelWidth: 120,
         }}
